@@ -1,4 +1,5 @@
 import type { GymSession } from '../types/item';
+import './ItemCard.css';
 
 interface Props {
   session: GymSession;

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { GymSession, Exercise } from '../types/item';
 import { generateUUID } from '../utils/uuid';
+import './FormularioItem.css';
 
 interface Props {
   onSave: (session: GymSession) => void;
