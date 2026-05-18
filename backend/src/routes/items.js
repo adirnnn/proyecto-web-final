@@ -50,7 +50,7 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const result = await db.query('UPDATE items SET activo = false WHERE id = $1 RETURNING *', [id]);
+    const result = await db.query('UPDATE items SET activo = 0 WHERE id = $1 RETURNING *', [id]);
     if (result.rows.length === 0) return res.status(404).json({ error: 'Not found' });
     res.json({ message: 'Item archived' });
   } catch (err) {
@@ -73,3 +73,4 @@ router.post('/:id/registro', async (req, res) => {
 });
 
 module.exports = router;
+ter;

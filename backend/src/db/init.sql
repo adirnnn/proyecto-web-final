@@ -6,17 +6,17 @@ CREATE TABLE IF NOT EXISTS items (
     categoriaId TEXT,
     estado TEXT,
     puntuacion REAL CHECK (puntuacion >= 0 AND puntuacion <= 10),
-    fechaRegistro TIMESTAMPTZ DEFAULT NOW(),
-    fechaActividad TIMESTAMPTZ DEFAULT NOW(),
+    fechaRegistro TEXT,
+    fechaActividad TEXT,
     notas TEXT,
-    atributos JSONB,
-    activo BOOLEAN DEFAULT TRUE
+    atributos TEXT, -- JSON serializado
+    activo INTEGER DEFAULT 1 -- 0 o 1
 );
 
 CREATE TABLE IF NOT EXISTS registros (
     id UUID PRIMARY KEY,
     itemId UUID REFERENCES items(id) ON DELETE CASCADE,
-    fecha TIMESTAMPTZ DEFAULT NOW(),
+    fecha TEXT,
     valor TEXT,
     notas TEXT
 );
