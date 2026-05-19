@@ -1,0 +1,28 @@
+:root {
+  --color-bg: #efebe3;
+  --color-primary: #135eab;
+  --color-primary-hover: #0d4a86;
+  --color-text: #2c3e50;
+  --color-surface: #ffffff;
+  --color-danger: #e74c3c;
+  --radius: 12px;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --spacing: 1rem;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+}
+
+#root {
+  width: 100%;
+}
