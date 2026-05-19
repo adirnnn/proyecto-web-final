@@ -1,19 +1,43 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { GymSession, Exercise } from '../types/item';
 import { generateUUID } from '../utils/uuid';
 import './FormularioItem.css';
 
 interface Props {
   onSave: (session: GymSession) => void;
+  editingItem: GymSession | null;
+  onCancel: () => void;
 }
 
-export const FormularioItem = ({ onSave }: Props) => {
+export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
   const [nombre, setNombre] = useState('');
   const [categoriaId, setCategoriaId] = useState<GymSession['categoriaId']>('Fuerza');
   const [puntuacion, setPuntuacion] = useState(5);
   const [notas, setNotas] = useState('');
   const [duracionMinutos, setDuracionMinutos] = useState(60);
   const [ejercicios, setEjercicios] = useState<Exercise[]>([]);
+
+  useEffect(() => {
+    if (editingItem) {
+      setNombre(editingItem.nombre);
+      setCategoriaId(editingItem.categoriaId);
+      setPuntuacion(editingItem.puntuacion);
+      setNotas(editingItem.notas);
+      setDuracionMinutos(editingItem.atributos.duracionMinutos);
+      setEjercicios(editingItem.atributos.ejercicios);
+    } else {
+      resetForm();
+    }
+  }, [editingItem]);
+
+  const resetForm = () => {
+    setNombre('');
+    setCategoriaId('Fuerza');
+    setPuntuacion(5);
+    setNotas('');
+    setDuracionMinutos(60);
+    setEjercicios([]);
+  };
 
   const addExercise = () => {
     const newEx: Exercise = {
@@ -43,13 +67,13 @@ export const FormularioItem = ({ onSave }: Props) => {
     
     const now = new Date().toISOString();
     
-    const newSession: GymSession = {
-      id: generateUUID(),
+    const sessionData: GymSession = {
+      id: editingItem ? editingItem.id : generateUUID(),
       nombre,
       categoriaId,
-      estado: 'pendiente',
+      estado: editingItem ? editingItem.estado : 'pendiente',
       puntuacion,
-      fechaRegistro: now,
+      fechaRegistro: editingItem ? editingItem.fechaRegistro : now,
       fechaActividad: now,
       notas,
       atributos: {
@@ -60,18 +84,13 @@ export const FormularioItem = ({ onSave }: Props) => {
       activo: true
     };
 
-    onSave(newSession);
-    // para resetear el form
-    setNombre('');
-    setNotas('');
-    setEjercicios([]);
-    setDuracionMinutos(60);
-    setPuntuacion(5);
+    onSave(sessionData);
+    resetForm();
   };
 
   return (
     <form onSubmit={handleSubmit} className="gym-form">
-      <h2>Nueva Sesión</h2>
+      <h2>{editingItem ? 'Editar Sesión' : 'Nueva Sesión'}</h2>
       <div className="form-group">
         <label>Nombre Rutina:</label>
         <input 
@@ -121,6 +140,13 @@ export const FormularioItem = ({ onSave }: Props) => {
 
       <div className="exercises-section">
         <h3>Ejercicios</h3>
+        <div className="exercise-header">
+          <span>Ejercicio</span>
+          <span>Sets</span>
+          <span>Reps</span>
+          <span>Peso (kg)</span>
+          <span></span>
+        </div>
         {ejercicios.map(ex => (
           <div key={ex.id} className="exercise-row">
             <input 
@@ -153,7 +179,16 @@ export const FormularioItem = ({ onSave }: Props) => {
         <button type="button" className="add-ex-btn" onClick={addExercise}>+ Agregar Ejercicio</button>
       </div>
 
-      <button type="submit" className="save-btn">Guardar Sesión</button>
+      <div className="form-actions">
+        <button type="submit" className="save-btn">
+          {editingItem ? 'Actualizar Sesión' : 'Guardar Sesión'}
+        </button>
+        {editingItem && (
+          <button type="button" className="cancel-btn" onClick={onCancel}>
+            Cancelar Edición
+          </button>
+        )}
+      </div>
     </form>
   );
 };

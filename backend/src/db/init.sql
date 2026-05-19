@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS items (
     fechaRegistro TEXT,
     fechaActividad TEXT,
     notas TEXT,
-    atributos TEXT, -- JSON serializado
-    activo INTEGER DEFAULT 1 -- 0 o 1
+    atributos TEXT,
+    activo INTEGER DEFAULT 1
 );
 
 CREATE TABLE IF NOT EXISTS registros (

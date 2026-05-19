@@ -1,68 +1,53 @@
-# Gym Tracker - Proyecto Final Fase 1 🏋️‍♂️
-**Sistemas y Tecnologías Web - Universidad del Valle de Guatemala**
+# Gym Tracker - Bitácora Personal (Fase 1)
+**UVG 231361 - Sistemas y Tecnologías Web**
 
-## Descripción del Proyecto
-Bitácora digital para el registro y seguimiento de sesiones de entrenamiento físico. Permite gestionar rutinas (fuerza, cardio, etc.), registrar ejercicios con sus respectivos sets/reps/peso y calcular el volumen total de cada sesión.
+Este es mi proyecto para la primera fase. Decidí hacer un tracker de gimnasio porque realmente me sirve en la vida real. Siempre he buscado una opción (sin estar dispuesto a pagar) para llevar el control de lo que levanto en cada sesión, cuanto peso, cuantos sets, cuantas reps, esfuerzo, etc. En lugar de anotarlo en el celular o en papel que después uno ni revisa esos apuntes ni los evalúa. Con una app que no solo haga eso sino que lo evalúe y de resumenes por sesión, por semana, por periodo de tiempo custom. Sería perfecto.
 
-Esta entrega comprende la **Fase 1**, con un Frontend CRUD reactivo y un Backend funcional con persistencia en PostgreSQL.
-
----
-
-## Estructura de la Solución
-
-### 1. Frontend (React + Vite + TS)
-- **Estado**: Manejo de sesiones mediante `useState` con *lazy initialization*.
-- **Persistencia**: Sincronización automática con `LocalStorage` usando `useEffect`.
-- **Componentes**: 
-  - `FormularioItem`: Creación dinámica de sesiones con filas de ejercicios.
-  - `ListaItems`: Renderizado del historial de entrenamientos.
-  - `ItemCard`: Visualización detallada y acciones (completar/eliminar).
-
-### 2. Backend (Node.js + Express)
-- **API REST**: 5 endpoints para gestión de items y registros.
-- **Base de Datos**: PostgreSQL para persistencia real.
-- **CORS**: Configurado para comunicación segura con el frontend.
+Esta fase simplemente se enfoca en que el frontend guarde todo en el navegador y que el backend ya tenga las tablas listas para cuando nos toque conectarlos en la Fase 2.
 
 ---
 
-## Cómo Ejecutar
-
-### Base de Datos
-1. Crear una base de datos en PostgreSQL llamada `gym_tracker`.
-2. Ejecutar el script `backend/src/db/init.sql` para crear las tablas `items` y `registros`.
-
-### Backend
-1. Ir a la carpeta `backend/`.
-2. Crear un archivo `.env` basado en `.env.example` con tus credenciales de PostgreSQL.
-3. Instalar dependencias: `npm install`
-4. Iniciar servidor: `npm run dev` (puerto 3000).
+## Lo que hice en esta Fase
 
 ### Frontend
-1. Ir a la carpeta `frontend/`.
-2. Instalar dependencias: `npm install`
-3. Iniciar aplicación: `npm run dev` (puerto 5173).
+Armé la interfaz con **React y Vite**. Lo más importante es que las sesiones no se borran al recargar la página porque usé `LocalStorage`.
+- El formulario permite agregar varios ejercicios a la misma sesión.
+- Calculo el volumen total (sets x reps x peso) automáticamente.
+- Dividí todo en componentes: `FormularioItem`, `ListaItems` e `ItemCard`.
+
+### Backend
+Hice un servidor con **Express** que ya se conecta a **PostgreSQL**.
+- Creé las tablas `items` (para las sesiones) y `registros`.
+- Los 5 endpoints ya están programados y listos para recibir datos.
 
 ---
 
-## Mis primeros Items (Evidencia Real)
+## Capturas de mi progreso
 
-A continuación se muestra la aplicación funcionando con datos reales de entrenamiento (no placeholders).
+Aquí se puede ver cómo quedó la interfaz y que ya la estoy probando con mis propios entrenamientos:
 
-### Captura de 3 Items Reales
-![Mis primeros Items](./screenshots/3items.jpg)
+### Mis primeros entrenamientos (Datos reales)
+![Mis entrenamientos](./screenshots/3items.jpg)
 
-### Interfaz de Usuario (Modern Theme)
-![Frontend Post-CSS](./screenshots/frontendfase1postcss.jpg)
+### Diseño de la App
+![Vista del Frontend (Pre CSS)](./screenshots/frontendfase1precss.jpg)
 
-### Estructura de Base de Datos (PostgreSQL)
-![Diagrama/BD](./screenshots/fase1DER.jpg)
+![Vista del Frontend (Post CSS)](./screenshots/frontendfase1postcss.jpg)
+
+### Tablas en PostgreSQL
+![Tablas en pgAdmin](./screenshots/fase1DER.jpg)
 
 ---
 
-## Requerimientos Técnicos Cumplidos
-- [x] **Vite + Express Setup**: Proyectos independientes y funcionales.
-- [x] **CRUD Completo**: Crear, leer, actualizar (estado) y archivar (soft delete).
-- [x] **LocalStorage**: Persistencia garantizada en el navegador.
-- [x] **API 5 Endpoints**: GET, POST, PUT, DELETE y POST /registro.
-- [x] **Base de Datos**: Tablas normalizadas en PostgreSQL.
-- [x] **Git**: Historial de commits detallado y organizado.
+## Cómo correr el proyecto
+
+### Para el Backend:
+1. Tener PostgreSQL instalado y una base de datos llamada `gym_tracker`.
+2. Correr el script de `backend/src/db/init.sql`.
+3. Crear un `.env` dentro de `backend/` con los datos de tu base de datos (puedes ver el `.env.example`).
+4. `npm install` y luego `npm run dev`.
+
+### Para el Frontend:
+1. `cd frontend`
+2. `npm install`
+3. `npm run dev` y abrir el link de Localhost.

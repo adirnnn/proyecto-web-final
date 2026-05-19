@@ -5,9 +5,10 @@ interface Props {
   session: GymSession;
   onDelete: (id: string) => void;
   onToggleStatus: (id: string) => void;
+  onEdit: (item: GymSession) => void;
 }
 
-export const ItemCard = ({ session, onDelete, onToggleStatus }: Props) => {
+export const ItemCard = ({ session, onDelete, onToggleStatus, onEdit }: Props) => {
   return (
     <div className={`item-card ${session.estado}`}>
       <h3>{session.nombre}</h3>
@@ -30,6 +31,11 @@ export const ItemCard = ({ session, onDelete, onToggleStatus }: Props) => {
         <button onClick={() => onToggleStatus(session.id)}>
           {session.estado === 'pendiente' ? 'Completar' : 'Reabrir'}
         </button>
+        {session.estado !== 'completado' && (
+          <button onClick={() => onEdit(session)}>
+            Editar
+          </button>
+        )}
         <button onClick={() => onDelete(session.id)} className="delete-btn">
           Eliminar
         </button>

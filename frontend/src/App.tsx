@@ -7,17 +7,28 @@ import './App.css'
 
 function App() {
   const [items, setItems] = useState<GymSession[]>(() => storageService.getItems());
+  const [editingItem, setEditingItem] = useState<GymSession | null>(null);
 
   useEffect(() => {
     storageService.saveItems(items);
   }, [items]);
 
   const handleSave = (session: GymSession) => {
-    setItems([session, ...items]);
+    if (editingItem) {
+      setItems(items.map(item => item.id === session.id ? session : item));
+      setEditingItem(null);
+    } else {
+      setItems([session, ...items]);
+    }
   };
 
   const handleDelete = (id: string) => {
     setItems(items.filter(item => item.id !== id));
+    if (editingItem?.id === id) setEditingItem(null);
+  };
+
+  const handleEdit = (item: GymSession) => {
+    setEditingItem(item);
   };
 
   const handleToggleStatus = (id: string) => {
@@ -37,7 +48,11 @@ function App() {
 
       <main className="content">
         <section className="form-section">
-          <FormularioItem onSave={handleSave} />
+          <FormularioItem 
+            onSave={handleSave} 
+            editingItem={editingItem} 
+            onCancel={() => setEditingItem(null)}
+          />
         </section>
         
         <section className="list-section">
@@ -45,7 +60,8 @@ function App() {
           <ListaItems 
             items={items} 
             onDelete={handleDelete} 
-            onToggleStatus={handleToggleStatus} 
+            onToggleStatus={handleToggleStatus}
+            onEdit={handleEdit}
           />
         </section>
       </main>
