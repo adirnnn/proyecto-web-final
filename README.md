@@ -1,9 +1,9 @@
 # Gym Tracker - Bitácora Personal (Fase 1)
-**UVG 231361 - Sistemas y Tecnologías Web**
+**UVG - Sistemas y Tecnologías Web**
 
-Este es mi proyecto para la primera fase. Decidí hacer un tracker de gimnasio porque realmente me sirve en la vida real. Siempre he buscado una opción (sin estar dispuesto a pagar) para llevar el control de lo que levanto en cada sesión, cuanto peso, cuantos sets, cuantas reps, esfuerzo, etc. En lugar de anotarlo en el celular o en papel que después uno ni revisa esos apuntes ni los evalúa. Con una app que no solo haga eso sino que lo evalúe y de resumenes por sesión, por semana, por periodo de tiempo custom. Sería perfecto.
+Este es mi proyecto para la primera fase. Decidí hacer un tracker de gimnasio porque me sirve para llevar el control de lo que levanto en cada sesión, en lugar de anotarlo en el celular o en papel.
 
-Esta fase simplemente se enfoca en que el frontend guarde todo en el navegador y que el backend ya tenga las tablas listas para cuando nos toque conectarlos en la Fase 2.
+En esta parte logré que el frontend guarde todo en el navegador y que el backend ya tenga las tablas listas para cuando nos toque conectarlos en la Fase 2.
 
 ---
 
@@ -14,6 +14,7 @@ Armé la interfaz con **React y Vite**. Lo más importante es que las sesiones n
 - El formulario permite agregar varios ejercicios a la misma sesión.
 - Calculo el volumen total (sets x reps x peso) automáticamente.
 - Dividí todo en componentes: `FormularioItem`, `ListaItems` e `ItemCard`.
+- Agregué la funcionalidad de **Editar Sesión** para corregir datos antes de completarlas.
 
 ### Backend
 Hice un servidor con **Express** que ya se conecta a **PostgreSQL**.
@@ -26,13 +27,12 @@ Hice un servidor con **Express** que ya se conecta a **PostgreSQL**.
 
 Aquí se puede ver cómo quedó la interfaz y que ya la estoy probando con mis propios entrenamientos:
 
-### Mis primeros entrenamientos (Datos reales)
-![Mis entrenamientos](./screenshots/3items.jpg)
+### Mis entrenamientos (Datos reales)
+![Entrenamientos Reales 1](./screenshots/itemsreales1.jpg)
+![Entrenamientos Reales 2](./screenshots/itemsreales2.jpg)
 
-### Diseño de la App
-![Vista del Frontend (Pre CSS)](./screenshots/frontendfase1precss.jpg)
-
-![Vista del Frontend (Post CSS)](./screenshots/frontendfase1postcss.jpg)
+### Diseño de la App (Modern Theme)
+![Vista del Frontend](./screenshots/frontendfase1postcss.jpg)
 
 ### Tablas en PostgreSQL
 ![Tablas en pgAdmin](./screenshots/fase1DER.jpg)
