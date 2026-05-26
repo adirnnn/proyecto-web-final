@@ -1,4 +1,4 @@
-:root {
+body[data-theme="claro"] {
   --color-bg: #efebe3;
   --color-primary: #135eab;
   --color-primary-hover: #0d4a86;
@@ -7,6 +7,18 @@
   --color-danger: #e74c3c;
   --radius: 12px;
   --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --spacing: 1rem;
+}
+
+body[data-theme="oscuro"] {
+  --color-bg: #1a242f;
+  --color-primary: #3a8c88;
+  --color-primary-hover: #2a6a66;
+  --color-text: #efebe3;
+  --color-surface: #2c3e50;
+  --color-danger: #e07a5f;
+  --radius: 12px;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   --spacing: 1rem;
 }
 
@@ -21,6 +33,7 @@ body {
   color: var(--color-text);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #root {

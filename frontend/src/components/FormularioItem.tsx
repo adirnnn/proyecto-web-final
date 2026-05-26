@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from 'react';
 import type { GymSession, Exercise } from '../types/item';
 import { generateUUID } from '../utils/uuid';
@@ -39,7 +40,6 @@ export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
       resetForm();
     }
   }, [editingItem]);
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   const addExercise = () => {
     const newEx: Exercise = {

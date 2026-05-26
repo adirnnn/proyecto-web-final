@@ -1,13 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import type { GymSession } from './types/item'
 import { storageService } from './services/storage'
 import { FormularioItem } from './components/FormularioItem'
 import { ListaItems } from './components/ListaItems'
+import { ThemeContext } from './context/ThemeContext'
+import { Sun, Moon } from 'lucide-react'
 import './App.css'
 
 function App() {
   const [items, setItems] = useState<GymSession[]>(() => storageService.getItems());
   const [editingItem, setEditingItem] = useState<GymSession | null>(null);
+  
+  const themeCtx = useContext(ThemeContext);
 
   useEffect(() => {
     storageService.saveItems(items);
@@ -41,9 +45,20 @@ function App() {
 
   return (
     <div className="container">
-      <header>
-        <h1>Gym Tracker</h1>
-        <p>Fase 1: useState + useEffect + LocalStorage</p>
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1>Gym Tracker</h1>
+          <p>Fase 2: StorageContext, ThemeContext y useRef</p>
+        </div>
+        {themeCtx && (
+          <button 
+            onClick={themeCtx.toggleTema} 
+            style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'inherit' }}
+            title="Cambiar Tema (T)"
+          >
+            {themeCtx.tema === 'claro' ? <Moon size={24} /> : <Sun size={24} />}
+          </button>
+        )}
       </header>
 
       <main className="content">
