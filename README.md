@@ -23,6 +23,13 @@ Hice un servidor con **Express** que ya se conecta a **PostgreSQL**.
 
 ---
 
+## Decisiones de Diseño (Fase 2)
+
+**Iconos en vez de emojis:**
+Las instrucciones pedían usar emojis para las categorías, pero decidí usar la librería `lucide-react` para los iconos. Siento que los emojis rompen la estética (crema y azul) que llevo hasta ahora. Toda la vibra visual, incluyendo la paleta de colores, la tomé inspirándome en **indoek.com** (una página de surf que vi en siteinspire). Por eso no usé el típico negro/rojo de gym, quería algo más chill.
+
+---
+
 ## Capturas de mi progreso
 
 Aquí se puede ver cómo quedó la interfaz y que ya la estoy probando con mis propios entrenamientos:

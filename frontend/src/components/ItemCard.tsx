@@ -8,11 +8,20 @@ interface Props {
   onEdit: (item: GymSession) => void;
 }
 
+import { CATEGORIAS } from '../utils/categorias';
+
 export const ItemCard = ({ session, onDelete, onToggleStatus, onEdit }: Props) => {
+  const category = CATEGORIAS.find(c => c.id === session.categoriaId);
+  const Icon = category?.icon;
+
   return (
     <div className={`item-card ${session.estado}`}>
       <h3>{session.nombre}</h3>
-      <p><strong>Categoría:</strong> {session.categoriaId}</p>
+      <p style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: category?.color }}>
+        <strong>Categoría:</strong> 
+        {Icon && <Icon size={18} />} 
+        {session.categoriaId}
+      </p>
       <p><strong>Estado:</strong> {session.estado}</p>
       <p><strong>RPE:</strong> {session.puntuacion}/10</p>
       <p><strong>Volumen Total:</strong> {session.atributos.volumenTotal} kg</p>

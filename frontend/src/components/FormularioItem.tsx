@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { GymSession, Exercise } from '../types/item';
 import { generateUUID } from '../utils/uuid';
+import { CATEGORIAS } from '../utils/categorias';
 import './FormularioItem.css';
 
 interface Props {
@@ -17,19 +18,6 @@ export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
   const [duracionMinutos, setDuracionMinutos] = useState(60);
   const [ejercicios, setEjercicios] = useState<Exercise[]>([]);
 
-  useEffect(() => {
-    if (editingItem) {
-      setNombre(editingItem.nombre);
-      setCategoriaId(editingItem.categoriaId);
-      setPuntuacion(editingItem.puntuacion);
-      setNotas(editingItem.notas);
-      setDuracionMinutos(editingItem.atributos.duracionMinutos);
-      setEjercicios(editingItem.atributos.ejercicios);
-    } else {
-      resetForm();
-    }
-  }, [editingItem]);
-
   const resetForm = () => {
     setNombre('');
     setCategoriaId('Fuerza');
@@ -38,6 +26,20 @@ export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
     setDuracionMinutos(60);
     setEjercicios([]);
   };
+
+  useEffect(() => {
+    if (editingItem) {
+      setNombre(editingItem.nombre);
+      setCategoriaId(editingItem.categoriaId);
+      setPuntuacion(editingItem.puntuacion ?? 5);
+      setNotas(editingItem.notas);
+      setDuracionMinutos(editingItem.atributos.duracionMinutos);
+      setEjercicios(editingItem.atributos.ejercicios);
+    } else {
+      resetForm();
+    }
+  }, [editingItem]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const addExercise = () => {
     const newEx: Exercise = {
@@ -103,11 +105,10 @@ export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
       
       <div className="form-group">
         <label>Categoría:</label>
-        <select value={categoriaId} onChange={e => setCategoriaId(e.target.value as any)}>
-          <option value="Fuerza">Fuerza</option>
-          <option value="Cardio">Cardio</option>
-          <option value="Flexibilidad">Flexibilidad</option>
-          <option value="Deportes">Deportes</option>
+        <select value={categoriaId} onChange={e => setCategoriaId(e.target.value as GymSession['categoriaId'])}>
+          {CATEGORIAS.map(cat => (
+            <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+          ))}
         </select>
       </div>
 

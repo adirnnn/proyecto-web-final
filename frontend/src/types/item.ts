@@ -15,7 +15,7 @@ export interface GymAtributos {
 export interface GymSession {
   id: string;
   nombre: string;
-  categoriaId: 'Fuerza' | 'Cardio' | 'Flexibilidad' | 'Deportes';
+  categoriaId: 'Fuerza' | 'Cardio' | 'Flexibilidad' | 'Deportes' | 'Resistencia';
   estado: 'pendiente' | 'completado';
   puntuacion: number | null; // RPE 0-10
   fechaRegistro: string;

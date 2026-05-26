@@ -5,7 +5,7 @@ const db = require('../db');
 // GET
 router.get('/', async (req, res) => {
   try {
-    const result = await db.query('SELECT * FROM items WHERE activo = true ORDER BY fechaRegistro DESC');
+    const result = await db.query('SELECT * FROM items WHERE activo = 1 ORDER BY fechaRegistro DESC');
     res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -73,4 +73,3 @@ router.post('/:id/registro', async (req, res) => {
 });
 
 module.exports = router;
-ter;
