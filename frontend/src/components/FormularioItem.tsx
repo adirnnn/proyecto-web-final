@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { GymSession, Exercise } from '../types/item';
 import { generateUUID } from '../utils/uuid';
 import { CATEGORIAS } from '../utils/categorias';
@@ -12,6 +12,9 @@ interface Props {
 }
 
 export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
+  const nombreInputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+
   const [nombre, setNombre] = useState('');
   const [categoriaId, setCategoriaId] = useState<GymSession['categoriaId']>('Fuerza');
   const [puntuacion, setPuntuacion] = useState(5);
@@ -40,6 +43,19 @@ export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
       resetForm();
     }
   }, [editingItem]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key.toLowerCase() === 'n') {
+        e.preventDefault();
+        onCancel();
+        nombreInputRef.current?.focus();
+        formRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onCancel]);
 
   const addExercise = () => {
     const newEx: Exercise = {
@@ -88,14 +104,19 @@ export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
 
     onSave(sessionData);
     resetForm();
+    
+    // usamos los refs acá! (1. focus, 2. scroll)
+    nombreInputRef.current?.focus();
+    formRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="gym-form">
-      <h2>{editingItem ? 'Editar Sesión' : 'Nueva Sesión'}</h2>
+    <form ref={formRef} onSubmit={handleSubmit} className="gym-form">
+      <h2>{editingItem ? 'Editar Sesión' : 'Nueva Sesión (Ctrl+N)'}</h2>
       <div className="form-group">
         <label>Nombre Rutina:</label>
         <input 
+          ref={nombreInputRef}
           value={nombre} 
           onChange={e => setNombre(e.target.value)} 
           placeholder="Ej: Pierna, Empuje..." 
