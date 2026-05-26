@@ -4,11 +4,14 @@ import './index.css'
 import App from './App.tsx'
 
 import { ThemeProvider } from './context/ThemeContext.tsx'
+import { StorageProvider } from './context/StorageContext.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
-      <App />
+      <StorageProvider>
+        <App />
+      </StorageProvider>
     </ThemeProvider>
   </StrictMode>,
 )
