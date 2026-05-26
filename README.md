@@ -14,9 +14,7 @@ Para esta fase me enfoqué en usar el Context API y hooks más avanzados de Reac
 - **Atajos de Teclado:** Aparte de la `T` para el tema, puse `Ctrl+N` global para crear una nueva sesión rápido (limpia el form y te baja el scroll de una vez, manejado con `useEffect` y su respectivo cleanup).
 - **Categorías y UI:** Añadí 5 categorías (Fuerza, Cardio, Resistencia, etc.). Todo con iconos `lucide-react` en lugar de emojis.
 
-Link Video Demo Fase 2: 
-
-<video controls src="https://uvggt-my.sharepoint.com/:v:/r/personal/lop231361_uvg_edu_gt/Documents/Web/Fase2ProyFinal.mp4?csf=1&web=1&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=wQQpKf" title="Title"></video>
+Link Video Demo Fase 2: https://uvggt-my.sharepoint.com/:v:/r/personal/lop231361_uvg_edu_gt/Documents/Web/Fase2ProyFinal.mp4?csf=1&web=1&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=wQQpKf
 
 ---
 
