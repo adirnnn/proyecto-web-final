@@ -1,17 +1,19 @@
-# Gym Tracker - Bitácora Personal (Fases 1 y 2)
+# Gym Tracker - Bitácora Personal (Fase 3 en progreso)
 **UVG - Sistemas y Tecnologías Web**
 
 Este es mi proyecto para el curso. Decidí hacer un tracker de gimnasio porque me sirve personalmente en mi día a día para llevar el control de lo que levanto en cada sesión, en lugar de anotarlo en el celular o en papel.
 
 ---
 
-## Lo que hice en la Fase 2
+## Cambios en Fase 3 (En curso)
 
-Para esta fase me enfoqué en usar el Context API y hooks más avanzados de React:
-- **StorageContext:** Creé un contexto híbrido para abstraer si los datos vienen del LocalStorage o de la API (PostgreSQL). ¡El frontend ni se entera de dónde vienen los datos! Y le puse un switch en el header para cambiar de modo.
-- **ThemeContext:** Agregué modo claro y oscuro con variables CSS. Se guarda en el localStorage para que no se pierda al recargar, y se puede cambiar rápido presionando la tecla `T`.
-- **useRef al rescate:** Le metí 2 usos a `useRef`. Uno (`nombreInputRef`) para hacer auto-focus en el input de nombre al crear una sesión, y otro (`formRef`) para hacer scroll automático hasta el formulario.
-- **Atajos de Teclado:** Aparte de la `T` para el tema, puse `Ctrl+N` global para crear una nueva sesión rápido (limpia el form y te baja el scroll de una vez, manejado con `useEffect` y su respectivo cleanup).
+### Atajo de Teclado Actualizado
+Cambié el atajo global de `Ctrl+N` a `Alt+N`. Me di cuenta de que al probarlo en Chrome, `Ctrl+N` siempre abría una pestaña nueva del navegador antes de que mi código pudiera atrapar el evento. Con `Alt+N` funciona perfecto y no choca con las funciones del sistema. Esto lo documenté porque es un cambio de UX para el usuario final (y para mí mientras lo uso).
+
+---
+
+## Lo que hice en la Fase 2
+- **Atajos de Teclado:** Aparte de la `T` para el tema, puse `Alt+N` global para crear una nueva sesión rápido (limpia el form y te baja el scroll de una vez, manejado con `useEffect` y su respectivo cleanup).
 - **Categorías y UI:** Añadí 5 categorías (Fuerza, Cardio, Resistencia, etc.). Todo con iconos `lucide-react` en lugar de emojis.
 
 Link Video Demo Fase 2: https://uvggt-my.sharepoint.com/:v:/r/personal/lop231361_uvg_edu_gt/Documents/Web/Fase2ProyFinal.mp4?csf=1&web=1&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=wQQpKf
