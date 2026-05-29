@@ -19,6 +19,7 @@ export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
   const [categoriaId, setCategoriaId] = useState<GymSession['categoriaId']>('Fuerza');
   const [puntuacion, setPuntuacion] = useState(5);
   const [notas, setNotas] = useState('');
+  const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date().toISOString().split('T')[0]);
   const [duracionMinutos, setDuracionMinutos] = useState(60);
   const [ejercicios, setEjercicios] = useState<Exercise[]>([]);
 
@@ -27,6 +28,7 @@ export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
     setCategoriaId('Fuerza');
     setPuntuacion(5);
     setNotas('');
+    setFechaSeleccionada(new Date().toISOString().split('T')[0]);
     setDuracionMinutos(60);
     setEjercicios([]);
   };
@@ -37,6 +39,7 @@ export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
       setCategoriaId(editingItem.categoriaId);
       setPuntuacion(editingItem.puntuacion ?? 5);
       setNotas(editingItem.notas);
+      setFechaSeleccionada(new Date(editingItem.fechaRegistro).toISOString().split('T')[0]);
       setDuracionMinutos(editingItem.atributos.duracionMinutos);
       setEjercicios(editingItem.atributos.ejercicios);
     } else {
@@ -83,6 +86,15 @@ export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
     
     const volumenTotal = ejercicios.reduce((acc, ex) => acc + (ex.sets * ex.reps * ex.peso), 0);
     
+    let fechaISO = new Date().toISOString();
+    try {
+      if (fechaSeleccionada) {
+        fechaISO = new Date(fechaSeleccionada + "T12:00:00Z").toISOString();
+      }
+    } catch (e) {
+      console.error("Error al procesar fecha seleccionada:", e);
+    }
+    
     const now = new Date().toISOString();
     
     const sessionData: GymSession = {
@@ -91,7 +103,7 @@ export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
       categoriaId,
       estado: editingItem ? editingItem.estado : 'pendiente',
       puntuacion,
-      fechaRegistro: editingItem ? editingItem.fechaRegistro : now,
+      fechaRegistro: fechaISO,
       fechaActividad: now,
       notas,
       atributos: {
@@ -105,7 +117,7 @@ export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
     onSave(sessionData);
     resetForm();
     
-    // usamos los refs acá! (1. focus, 2. scroll)
+    // usamos los refs acá (1. focus, 2. scroll)
     nombreInputRef.current?.focus();
     formRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -131,6 +143,16 @@ export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
             <option key={cat.id} value={cat.id}>{cat.nombre}</option>
           ))}
         </select>
+      </div>
+
+      <div className="form-group">
+        <label>Fecha de Sesión:</label>
+        <input 
+          type="date" 
+          value={fechaSeleccionada} 
+          onChange={e => setFechaSeleccionada(e.target.value)} 
+          required 
+        />
       </div>
 
       <div className="form-group">

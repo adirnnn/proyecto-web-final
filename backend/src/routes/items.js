@@ -31,13 +31,13 @@ router.post('/', async (req, res) => {
 // PUT
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const { nombre, categoriaId, estado, puntuacion, fechaActividad, notas, atributos } = req.body;
+  const { nombre, categoriaId, estado, puntuacion, fechaRegistro, fechaActividad, notas, atributos } = req.body;
   try {
     const query = `
       UPDATE items 
-      SET nombre = $1, categoriaId = $2, estado = $3, puntuacion = $4, fechaActividad = $5, notas = $6, atributos = $7
-      WHERE id = $8 RETURNING *`;
-    const values = [nombre, categoriaId, estado, puntuacion, fechaActividad, notas, atributos, id];
+      SET nombre = $1, categoriaId = $2, estado = $3, puntuacion = $4, fechaRegistro = $5, fechaActividad = $6, notas = $7, atributos = $8
+      WHERE id = $9 RETURNING *`;
+    const values = [nombre, categoriaId, estado, puntuacion, fechaRegistro, fechaActividad, notas, atributos, id];
     const result = await db.query(query, values);
     if (result.rows.length === 0) return res.status(404).json({ error: 'Not found' });
     res.json(result.rows[0]);

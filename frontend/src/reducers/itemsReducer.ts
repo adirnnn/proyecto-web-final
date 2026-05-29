@@ -11,10 +11,10 @@ export type ItemsAccion =
   | { type: 'HIDRATAR'; payload: GymSession[] }
   | { type: 'AGREGAR'; payload: GymSession }
   | { type: 'ELIMINAR'; payload: string }
-  | { type: 'CAMBIAR_ESTADO'; payload: { id: string; estado: 'pendiente' | 'completado' } }
+  | { type: 'CAMBIAR_ESTADO'; payload: { id: string; estado: 'pendiente' | 'completado'; fechaActividad: string } }
   | { type: 'FILTRAR'; payload: { campo: 'filtroCategoria' | 'filtroEstado' | 'busqueda'; valor: string } }
   | { type: 'LIMPIAR_FILTROS' }
-  | { type: 'REGISTRAR_PR'; payload: { sessionId: string; ejercicioId: string; nuevoPeso: number } };
+  | { type: 'REGISTRAR_ACTIVIDAD'; payload: { sessionId: string; registro: string } };
 
 export const estadoInicial: ItemsEstado = {
   lista: [],
@@ -28,7 +28,7 @@ export function itemsReducer(estado: ItemsEstado, accion: ItemsAccion): ItemsEst
     case 'HIDRATAR':
       return {
         ...estado,
-        lista: accion.payload,
+        lista: Array.isArray(accion.payload) ? accion.payload : [],
       };
 
     case 'AGREGAR':
@@ -38,11 +38,11 @@ export function itemsReducer(estado: ItemsEstado, accion: ItemsAccion): ItemsEst
       };
 
     case 'ELIMINAR':
-      // hacemos borrado logico para mantener consistencia con lo que podria esperar un backend, 
-      // aunque el requerimiento dice eliminar de la lista.
       return {
         ...estado,
-        lista: estado.lista.filter(item => item.id !== accion.payload),
+        lista: estado.lista.map(item =>
+          item.id === accion.payload ? { ...item, activo: false } : item
+        ),
       };
 
     case 'CAMBIAR_ESTADO':
@@ -50,7 +50,7 @@ export function itemsReducer(estado: ItemsEstado, accion: ItemsAccion): ItemsEst
         ...estado,
         lista: estado.lista.map(item =>
           item.id === accion.payload.id
-            ? { ...item, estado: accion.payload.estado, fechaActividad: new Date().toISOString() }
+            ? { ...item, estado: accion.payload.estado, fechaActividad: accion.payload.fechaActividad }
             : item
         ),
       };
@@ -69,32 +69,14 @@ export function itemsReducer(estado: ItemsEstado, accion: ItemsAccion): ItemsEst
         busqueda: '',
       };
 
-    case 'REGISTRAR_PR':
+    case 'REGISTRAR_ACTIVIDAD':
       return {
         ...estado,
-        lista: estado.lista.map(session => {
-          if (session.id === accion.payload.sessionId) {
-            const ejerciciosActualizados = session.atributos.ejercicios.map(ex => {
-              if (ex.id === accion.payload.ejercicioId) {
-                return { ...ex, peso: accion.payload.nuevoPeso };
-              }
-              return ex;
-            });
-            
-            // recalculamos volumen total de la sesion
-            const nuevoVolumen = ejerciciosActualizados.reduce((acc, curr) => acc + (curr.sets * curr.reps * curr.peso), 0);
-            
-            return {
-              ...session,
-              atributos: {
-                ...session.atributos,
-                ejercicios: ejerciciosActualizados,
-                volumenTotal: nuevoVolumen
-              }
-            };
-          }
-          return session;
-        })
+        lista: estado.lista.map(item =>
+          item.id === accion.payload.sessionId
+            ? { ...item, notas: (item.notas || "") + " | " + accion.payload.registro }
+            : item
+        ),
       };
 
     default:

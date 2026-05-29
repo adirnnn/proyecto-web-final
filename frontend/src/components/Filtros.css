@@ -1,13 +1,15 @@
 .filtros-container {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   flex-wrap: wrap;
   align-items: flex-end;
-  background: var(--bg-card, #fff);
-  padding: 1rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-  margin-bottom: 2rem;
+  justify-content: center;
+  background: var(--color-surface);
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  margin: 0 auto 2rem auto;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .filtro-group {

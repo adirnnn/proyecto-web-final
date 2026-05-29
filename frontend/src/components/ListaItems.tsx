@@ -6,9 +6,10 @@ interface Props {
   onDelete: (id: string) => void;
   onToggleStatus: (id: string) => void;
   onEdit: (item: GymSession) => void;
+  onAddActivity: (id: string) => void;
 }
 
-export const ListaItems = ({ items, onDelete, onToggleStatus, onEdit }: Props) => {
+export const ListaItems = ({ items, onDelete, onToggleStatus, onEdit, onAddActivity }: Props) => {
   if (items.length === 0) return <p>No hay sesiones registradas.</p>;
 
   return (
@@ -20,6 +21,7 @@ export const ListaItems = ({ items, onDelete, onToggleStatus, onEdit }: Props) =
           onDelete={onDelete} 
           onToggleStatus={onToggleStatus} 
           onEdit={onEdit}
+          onAddActivity={onAddActivity}
         />
       ))}
     </div>
