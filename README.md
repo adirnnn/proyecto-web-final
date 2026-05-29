@@ -5,7 +5,7 @@ Este es mi proyecto para el curso. Decidí hacer un tracker de gimnasio porque m
 
 ---
 
-## Cambios en Fase 3 (En curso)
+## Cambios en Fase 3 Extras
 
 ### Atajo de Teclado Actualizado
 Cambié el atajo global de `Ctrl+N` a `Alt+N`. Me di cuenta de que al probarlo en Chrome, `Ctrl+N` siempre abría una pestaña nueva del navegador antes de que mi código pudiera atrapar el evento. Con `Alt+N` funciona perfecto y no choca con las funciones del sistema. Esto lo documenté porque es un cambio de UX para el usuario final (y para mí mientras lo uso).
@@ -16,7 +16,9 @@ Cambié el atajo global de `Ctrl+N` a `Alt+N`. Me di cuenta de que al probarlo e
 - **Atajos de Teclado:** Aparte de la `T` para el tema, puse `Alt+N` global para crear una nueva sesión rápido (limpia el form y te baja el scroll de una vez, manejado con `useEffect` y su respectivo cleanup).
 - **Categorías y UI:** Añadí 5 categorías (Fuerza, Cardio, Resistencia, etc.). Todo con iconos `lucide-react` en lugar de emojis.
 
-Link Video Demo Fase 2: https://uvggt-my.sharepoint.com/:v:/r/personal/lop231361_uvg_edu_gt/Documents/Web/Fase2ProyFinal.mp4?csf=1&web=1&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=wQQpKf
+Link Video Demo Fase 2: https://uvggt-my.sharepoint.com/:v:/g/personal/lop231361_uvg_edu_gt/IQA2NwjzHqQNTZNpLN3ylJbsAZRa7Hc7JHHSy_LPOlqjiHw?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=133GYB
+
+Link Video Demo Fase 3: https://uvggt-my.sharepoint.com/:v:/g/personal/lop231361_uvg_edu_gt/IQAPTvH7tJDuRKqEq2WM5rB-ARlisflWW9fiZbaDJZGq7jA?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=8XwxOm
 
 ---
 
@@ -61,6 +63,11 @@ Aquí se puede ver cómo quedó la interfaz y que ya la estoy probando con mis p
 ![Tema Claro](./screenshots/themeclaro.jpg)
 ![Tema Oscuro](./screenshots/themeoscuro.jpg)
 
+### Progreso Fase 3
+![Progreso](./screenshots/progresofase3.jpg)
+![Progreso2](./screenshots/progreso2fase3.jpg)
+![Progreso3](./screenshots/progreso3fase3.jpg)
+
 ---
 
 ## Cómo correr el proyecto
@@ -75,3 +82,35 @@ Aquí se puede ver cómo quedó la interfaz y que ya la estoy probando con mis p
 1. `cd frontend`
 2. `npm install`
 3. `npm run dev` y abrir el link de Localhost.
+
+---
+
+## Fase 3: useReducer, Recharts y Optimización
+
+### 1. Mi Gráfica Original
+**Evolución de PRs (Peso Máximo)**
+- **Qué muestra:** Una gráfica de línea (`LineChart`) que ilustra cómo ha ido subiendo o bajando el peso máximo levantado a lo largo del tiempo (agrupado por fecha).
+- **Por qué fue elegida:** En un gym tracker, el progreso progresivo es lo más importante. En vez de solo ver cuántos minutos entrené, lo que más me sirve en mi día a día es ver si mis levantamientos máximos (PRs).
+
+### 2. Mis 3 Decisiones Técnicas
+
+1. **Estructura del reducer:**
+   Decidí estructurar el estado inicial no solo con la `lista` de sesiones, sino incluyendo ahí mismo el estado de los filtros (`filtroCategoria`, `filtroEstado`, `busqueda`). Esto me permitió tener una sola fuente de la verdad para todo el contexto visual de la app, y usar `useMemo` más limpio en base a ese estado único.
+
+2. **Acción de Historial (`REGISTRAR_ACTIVIDAD`):**
+   Para cumplir con el requisito de "agregar un registro de actividad al historial", implementé un sistema de notas acumulativas. El usuario puede presionar el botón "+ Nota" en cualquier sesión, lo que dispara un dispatch que concatena la nueva entrada al campo de `notas` existente, permitiendo llevar una bitácora detallada dentro de una misma rutina.
+
+3. **Acción más difícil (`REGISTRAR_PR`):**
+   Implica buscar la sesión por ID, luego iterar sobre sus ejercicios anidados, encontrar el ejercicio específico, cambiarle el peso, y finalmente **recalcular el volumen total** de toda la sesión (sets x reps x peso) sumando todos los ejercicios. Todo sin mutar el objeto original de la lista.
+
+4. **Gráfica más compleja (Evolución PRs):**
+   Fue la más compleja de procesar para `recharts` porque la data no venía plana. Tuve que iterar la `lista` de sesiones filtradas, luego iterar sus `atributos.ejercicios`, sacar el `Math.max` de peso, y agruparlo en un objeto temporal con la fecha como key, para finalmente ordenarlo cronológicamente y mapearlo al formato `{ date, val }` que necesita `LineChart`.
+
+### 3. Profiler y Rendimiento (useMemo, useCallback y React.memo)
+
+Al medir con React DevTools Profiler, la diferencia se nota muchísimo al escribir en la barra de búsqueda:
+
+- **Antes de la optimización:** Por cada letra que tecleaba en el input, absolutamente toda la lista de `ItemCard`, los filtros y los cálculos de las gráficas se volvían a renderizar, lo que provocaba micro-tirones y un renderizado "amarillo/rojo" en el profiler.
+- **Después de la optimización:** Como usé `useMemo` para calcular `itemsVisibles` y los datos de las gráficas, además de `React.memo` exportando el `ItemCard`, al escribir en el buscador los componentes de ItemCard individuales dejaron de re-renderizarse. Esto mejoró el rendimiento porque React ya no destruye y reconstruye el DOM de cada sesión guardada si sus props no cambiaron. Las funciones pasadas (como `onToggleStatus` o `onDelete`) ahora están estables gracias a `useCallback`, evitando que rompan el `React.memo`.
+
+---
