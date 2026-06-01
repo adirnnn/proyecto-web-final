@@ -1,5 +1,7 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useEffect } from 'react';
 import type { ReactNode } from 'react';
+import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useAtajoTeclado } from '../hooks/useAtajoTeclado';
 
 type Theme = 'claro' | 'oscuro';
 
@@ -12,30 +14,18 @@ interface ThemeContextType {
 export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [tema, setTema] = useState<Theme>(() => {
-    return (localStorage.getItem('theme') as Theme) || 'claro';
-  });
+  const [tema, setTema] = useLocalStorage<Theme>('theme', 'claro');
 
   useEffect(() => {
     document.body.setAttribute('data-theme', tema);
-    localStorage.setItem('theme', tema);
   }, [tema]);
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      // atajo T para cambiar tema
-      if (e.key.toLowerCase() === 't' && e.target === document.body) {
-        setTema(prev => prev === 'claro' ? 'oscuro' : 'claro');
-      }
-    };
-
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, []);
 
   const toggleTema = () => {
     setTema(prev => prev === 'claro' ? 'oscuro' : 'claro');
   };
+
+  // Refactorizado a custom hook useAtajoTeclado
+  useAtajoTeclado('t', toggleTema);
 
   return (
     <ThemeContext.Provider value={{ tema, toggleTema }}>

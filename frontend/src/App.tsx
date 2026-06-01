@@ -7,7 +7,9 @@ import { FormularioItem } from './components/FormularioItem'
 import { Filtros } from './components/Filtros'
 import { ListaItems } from './components/ListaItems'
 import { GraficasGym } from './components/GraficasGym'
-import { Sun, Moon, Cloud, Database } from 'lucide-react'
+import { BackendStatus } from './components/BackendStatus'
+import { Sun, Moon, Cloud, Database, Dumbbell, Award, TrendingUp } from 'lucide-react'
+import { useProgresoPR } from './hooks/useProgresoPR'
 import './App.css'
 
 function App() {
@@ -17,13 +19,16 @@ function App() {
   const storageCtx = useContext(StorageContext);
   const themeCtx = useContext(ThemeContext);
 
+  // estadísticas del dominio usando custom hook
+  const { volumenHistorico, totalSesiones, promedioRPE } = useProgresoPR(estado.lista);
+
   useEffect(() => {
     if (storageCtx) {
       storageCtx.obtenerItems().then(items => {
         dispatch({ type: 'HIDRATAR', payload: items });
       }).catch(err => console.error("Error al hidratar:", err));
     }
-    // Solo dependemos de obtenerItems (estable) y el modo
+    // solo dependemos de obtenerItems (estable) y el modo
   }, [storageCtx?.obtenerItems, storageCtx?.modo]);
 
   const itemsVisibles = useMemo(() => {
@@ -107,12 +112,27 @@ function App() {
                 <span className={`status-dot ${storageCtx.error ? 'error' : 'ok'}`} title={storageCtx.error || 'Backend Conectado'}></span>
               )}
             </button>
+            <BackendStatus />
             <button className="theme-toggle" onClick={themeCtx.toggleTema}>
               {themeCtx.tema === 'claro' ? <Moon size={20} /> : <Sun size={20} />}
             </button>
           </div>
         </div>
-        <p>useReducer · Recharts · Optimización</p>
+        <div className="header-stats">
+          <div className="stat-item" title="Sesiones completadas">
+            <Award size={16} />
+            <span>{totalSesiones}</span>
+          </div>
+          <div className="stat-item" title="Volumen total (kg)">
+            <Dumbbell size={16} />
+            <span>{volumenHistorico.toLocaleString()} kg</span>
+          </div>
+          <div className="stat-item" title="Promedio de Esfuerzo (RPE)">
+            <TrendingUp size={16} />
+            <span>{promedioRPE} RPE</span>
+          </div>
+        </div>
+        <p>Custom Hooks, Deploy, Demo</p>
       </header>
       
       <main className="content">

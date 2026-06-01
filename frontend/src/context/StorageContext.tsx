@@ -1,6 +1,7 @@
 import { createContext, useState, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import type { GymSession } from '../types/item';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 type Modo = 'api' | 'local';
 
@@ -17,19 +18,12 @@ interface StorageContextType {
 export const StorageContext = createContext<StorageContextType | undefined>(undefined);
 
 export const StorageProvider = ({ children }: { children: ReactNode }) => {
-  const [modo, setModoState] = useState<Modo>(() => {
-    return (localStorage.getItem('modo') as Modo) || 'local';
-  });
+  const [modo, setModo] = useLocalStorage<Modo>('modo', 'local');
 
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
-  const setModo = useCallback((nuevoModo: Modo) => {
-    setModoState(nuevoModo);
-    localStorage.setItem('modo', nuevoModo);
-  }, []);
 
   const obtenerItems = useCallback(async (): Promise<GymSession[]> => {
     setCargando(true);
