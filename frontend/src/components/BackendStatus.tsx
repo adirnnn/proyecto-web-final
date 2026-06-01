@@ -1,23 +1,27 @@
 import { useFetch } from '../hooks/useFetch';
-import { Activity } from 'lucide-react';
 
 // componente que muestra el estado de conexión con el backend utilizando el custom hook useFetch
 export function BackendStatus() {
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
   const { data, loading, error } = useFetch<{ status: string }>(`${API_URL}/health`);
 
-  if (loading) return <span className="status-label">Verificando...</span>;
+  if (loading) return (
+    <div className="status-indicator warning">
+      <div className="status-dot-inner warning"></div>
+      <span>Verificando...</span>
+    </div>
+  );
   
   if (error) return (
     <div className="status-indicator offline">
-      <Activity size={14} />
-      <span>Offline</span>
+      <div className="status-dot-inner offline"></div>
+      <span>Servidor Offline</span>
     </div>
   );
 
   return (
     <div className={`status-indicator ${data?.status === 'ok' ? 'online' : 'error'}`}>
-      <Activity size={14} />
+      <div className={`status-dot-inner ${data?.status === 'ok' ? 'online' : 'offline'}`}></div>
       <span>{data?.status === 'ok' ? 'Servidor Online' : 'Problema Server'}</span>
     </div>
   );

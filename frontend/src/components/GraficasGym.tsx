@@ -1,143 +1,246 @@
-import { useMemo, memo } from 'react';
+import { memo, useMemo, useState, useEffect } from 'react';
 import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-  PieChart, Pie, Cell,
-  LineChart, Line
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Legend, BarChart, Bar, LineChart, Line
 } from 'recharts';
 import type { GymSession } from '../types/item';
-import { CATEGORIAS } from '../utils/categorias';
 import './GraficasGym.css';
 
 interface Props {
   items: GymSession[];
 }
 
+const COLORS = ['#135eab', '#3a8c88', '#e74c3c', '#f39c12', '#9b59b6'];
+
 export const GraficasGym = memo(({ items }: Props) => {
-  const datosActividad = useMemo(() => {
-    const diasLabels = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];
-    const hoy = new Date();
-    const result = [];
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(hoy.getDate() - i);
-      const diaStr = d.toISOString().split('T')[0];
+  // se filtran solo sesiones completadas y activas
+  const completed = useMemo(() => {
+    return (items || []).filter(i => i.estado === 'completado' && i.activo);
+  }, [items]);
 
-      const mins = (items || [])
-        .filter(item => {
-          if (!item?.fechaRegistro) return false;
-          // Normalizamos a YYYY-MM-DD para comparar
-          try {
-            const itemFecha = new Date(item.fechaRegistro).toISOString().split('T')[0];
-            return itemFecha === diaStr;
-          } catch (e) {
-            return false;
-          }
-        })
-        .reduce((acc, curr) => acc + (curr?.atributos?.duracionMinutos || 0), 0);
-      result.push({ name: diasLabels[d.getDay()], value: mins });
+  // 1. lista segura de ejercicios
+  const listaEjercicios = useMemo(() => {
+    const nombres = new Set<string>();
+    completed.forEach(s => {
+      (s.atributos?.ejercicios || []).forEach(e => {
+        if (e && e.nombre) {
+          const n = e.nombre.trim();
+          if (n) nombres.add(n);
+        }
+      });
+    });
+    return Array.from(nombres).sort();
+  }, [completed]);
+
+  const [ejercicioSeleccionado, setEjercicioSeleccionado] = useState<string>('');
+
+  // efecto seguro para inicializar el select
+  useEffect(() => {
+    if (listaEjercicios.length > 0 && !listaEjercicios.includes(ejercicioSeleccionado)) {
+      setEjercicioSeleccionado(listaEjercicios[0]);
     }
-    return result;
-  }, [items]);
+  }, [listaEjercicios, ejercicioSeleccionado]);
 
-  // 2. Categorías (Pie)
-  const datosCategorias = useMemo(() => {
-    return CATEGORIAS.map(cat => ({
-      name: cat.nombre,
-      count: (items || []).filter(i => i?.categoriaId === cat.id && i?.activo !== false).length,
-      color: cat.color
-    })).filter(d => d.count > 0);
-  }, [items]);
-
-  // 3. PRs (Línea) - Tu Gráfica Original
+  // data para PRs
   const datosPRs = useMemo(() => {
-    const registros: { [key: string]: number } = {};
-    (items || []).forEach(s => {
-      if (!s?.fechaRegistro) return;
-      try {
-        const f = new Date(s.fechaRegistro).toISOString().split('T')[0];
-        const max = (s.atributos?.ejercicios || []).reduce((m, ex) => Math.max(m, ex?.peso || 0), 0);
-        if (!registros[f] || max > registros[f]) registros[f] = max;
-      } catch (e) {
-        console.error("Error procesando fecha en PRs:", s.fechaRegistro);
+    if (!ejercicioSeleccionado) return [];
+    
+    return completed
+      .sort((a, b) => new Date(a.fechaRegistro).getTime() - new Date(b.fechaRegistro).getTime())
+      .map(s => {
+        const ejs = (s.atributos?.ejercicios || []).filter(
+          e => e.nombre && e.nombre.trim().toLowerCase() === ejercicioSeleccionado.toLowerCase()
+        );
+        if (ejs.length === 0) return null;
+        
+        const maxPeso = Math.max(...ejs.map(e => e.peso || 0));
+        
+        let dateStr = '';
+        try {
+          const d = new Date(s.fechaRegistro);
+          dateStr = isNaN(d.getTime()) ? '' : `${d.getDate()}/${d.getMonth() + 1}`;
+        } catch { /* ignore */ }
+
+        return {
+          date: dateStr,
+          peso: maxPeso
+        };
+      })
+      .filter((d): d is NonNullable<typeof d> => d !== null);
+  }, [completed, ejercicioSeleccionado]);
+
+  // Data para volumen histórico (Area)
+  const dataVolumen = useMemo(() => {
+    return [...completed]
+      .sort((a, b) => new Date(a.fechaRegistro).getTime() - new Date(b.fechaRegistro).getTime())
+      .map(i => {
+        let dateStr = '';
+        try {
+          const d = new Date(i.fechaRegistro);
+          dateStr = isNaN(d.getTime()) ? '' : `${d.getDate()}/${d.getMonth() + 1}`;
+        } catch { /* ignore */ }
+
+        return {
+          fecha: dateStr,
+          volumen: i.atributos?.volumenTotal || 0,
+          nombre: i.nombre
+        };
+      });
+  }, [completed]);
+
+  // data para chart pie
+  const dataCategorias = useMemo(() => {
+    const counts: Record<string, number> = {};
+    completed.forEach(i => {
+      if (i.categoriaId) {
+        counts[i.categoriaId] = (counts[i.categoriaId] || 0) + 1;
       }
     });
-    return Object.keys(registros).sort().map(f => ({
-      date: f.split('-').slice(1).reverse().join('/'),
-      val: registros[f]
-    }));
-  }, [items]);
+    return Object.keys(counts).map(cat => ({ name: cat, value: counts[cat] }));
+  }, [completed]);
 
-  if (!items || items.length === 0) {
+  // data para RPE bars
+  const dataRPE = useMemo(() => {
+    return completed.slice(-10).map(i => ({
+      name: (i.nombre || 'Sesión').slice(0, 10),
+      rpe: i.puntuacion || 0
+    }));
+  }, [completed]);
+
+  if (completed.length === 0) {
     return (
-      <div className="no-data-card">
-        <p>Registra un par de sesiones para ver tus estadísticas.</p>
+      <div className="dashboard-grid">
+        <div className="no-data-card">
+          <p>Registra al menos una sesión completada para visualizar tus estadísticas de progreso.</p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="dashboard-grid">
-      <div className="chart-card">
-        <h3>Actividad Semanal</h3>
-        <BarChart width={340} height={220} data={datosActividad} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-text)" opacity={0.1} />
-          <XAxis dataKey="name" fontSize={12} tick={{ fill: 'var(--color-text)' }} axisLine={false} tickLine={false} />
-          <YAxis fontSize={12} tick={{ fill: 'var(--color-text)' }} axisLine={false} tickLine={false} />
-          <Tooltip 
-            contentStyle={{ backgroundColor: 'var(--color-surface)', border: 'none', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow)' }}
-            itemStyle={{ color: 'var(--color-primary)' }}
-          />
-          <Legend iconType="circle" />
-          <Bar dataKey="value" name="Minutos" fill="var(--color-primary)" radius={[4, 4, 0, 0]} isAnimationActive={false} />
-        </BarChart>
-      </div>
-
-      <div className="chart-card">
-        <h3>Distribución por Tipo</h3>
-        <PieChart width={340} height={220}>
-          <Pie
-            data={datosCategorias}
-            cx="50%"
-            cy="45%"
-            innerRadius={60}
-            outerRadius={80}
-            paddingAngle={5}
-            dataKey="count"
-            nameKey="name"
-            isAnimationActive={false}
-          >
-            {datosCategorias.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
-            ))}
-          </Pie>
-          <Tooltip 
-            contentStyle={{ backgroundColor: 'var(--color-surface)', border: 'none', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow)' }}
-          />
-          <Legend verticalAlign="bottom" height={36} iconType="circle" />
-        </PieChart>
+      <div className="chart-card full-width">
+        <div className="chart-inner">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <h3>Evolución de PR: {ejercicioSeleccionado || 'Selecciona un ejercicio'}</h3>
+            {listaEjercicios.length > 0 && (
+              <select 
+                className="exercise-select"
+                value={ejercicioSeleccionado}
+                onChange={(e) => setEjercicioSeleccionado(e.target.value)}
+              >
+                {listaEjercicios.map(nombre => (
+                  <option key={nombre} value={nombre}>{nombre}</option>
+                ))}
+              </select>
+            )}
+          </div>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={datosPRs} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-text)" opacity={0.1} />
+              <XAxis dataKey="date" fontSize={12} stroke="var(--color-text)" axisLine={false} tickLine={false} />
+              <YAxis fontSize={12} stroke="var(--color-text)" axisLine={false} tickLine={false} label={{ value: 'kg', angle: -90, position: 'insideLeft', offset: 10 }} />
+              <Tooltip 
+                contentStyle={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--glass-border)', borderRadius: '12px', boxShadow: 'var(--shadow)' }}
+                formatter={(value: number) => [`${value} kg`, 'Peso Máximo']}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="peso" 
+                stroke="var(--color-danger)" 
+                strokeWidth={4} 
+                dot={{ r: 5, fill: 'var(--color-danger)', strokeWidth: 0 }} 
+                activeDot={{ r: 8 }}
+                animationDuration={1000}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       <div className="chart-card full-width">
-        <h3>Evolución de PRs (Peso Máximo)</h3>
-        <LineChart width={720} height={220} data={datosPRs} margin={{ top: 5, right: 30, left: -10, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-text)" opacity={0.1} />
-          <XAxis dataKey="date" fontSize={12} tick={{ fill: 'var(--color-text)' }} axisLine={false} tickLine={false} />
-          <YAxis fontSize={12} tick={{ fill: 'var(--color-text)' }} axisLine={false} tickLine={false} />
-          <Tooltip 
-            contentStyle={{ backgroundColor: 'var(--color-surface)', border: 'none', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow)' }}
-          />
-          <Legend verticalAlign="top" align="right" height={36} iconType="circle" />
-          <Line 
-            type="monotone" 
-            dataKey="val" 
-            name="Peso (kg)" 
-            stroke="var(--color-danger)" 
-            strokeWidth={3} 
-            dot={{ r: 4, fill: 'var(--color-danger)', strokeWidth: 0 }} 
-            activeDot={{ r: 6 }}
-            isAnimationActive={false}
-          />
-        </LineChart>
+        <div className="chart-inner">
+          <h3>Volumen Total por Sesión</h3>
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={dataVolumen} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="colorVol" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-text)" opacity={0.1} />
+              <XAxis 
+                dataKey="fecha" 
+                stroke="var(--color-text)" 
+                fontSize={12} 
+                tickLine={false} 
+                axisLine={false} 
+              />
+              <YAxis stroke="var(--color-text)" fontSize={12} tickLine={false} axisLine={false} />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'var(--color-surface)', 
+                  borderRadius: '12px', 
+                  border: '1px solid var(--glass-border)',
+                  boxShadow: 'var(--shadow)' 
+                }} 
+              />
+              <Area type="monotone" dataKey="volumen" stroke="var(--color-primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorVol)" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className="chart-card">
+        <div className="chart-inner">
+          <h3>Distribución de Entrenamientos</h3>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={dataCategorias}
+                innerRadius={60}
+                outerRadius={80}
+                paddingAngle={5}
+                dataKey="value"
+              >
+                {dataCategorias.map((_entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'var(--color-surface)', 
+                  borderRadius: '12px', 
+                  border: '1px solid var(--glass-border)' 
+                }} 
+              />
+              <Legend verticalAlign="bottom" height={36} iconType="circle" />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className="chart-card">
+        <div className="chart-inner">
+          <h3>Intensidad RPE Reciente</h3>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={dataRPE}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-text)" opacity={0.1} />
+              <XAxis dataKey="name" stroke="var(--color-text)" fontSize={10} tickLine={false} axisLine={false} />
+              <YAxis stroke="var(--color-text)" fontSize={12} tickLine={false} axisLine={false} domain={[0, 10]} />
+              <Tooltip 
+                cursor={{ fill: 'rgba(0,0,0,0.02)' }}
+                contentStyle={{ 
+                  backgroundColor: 'var(--color-surface)', 
+                  borderRadius: '12px', 
+                  border: '1px solid var(--glass-border)' 
+                }} 
+              />
+              <Bar dataKey="rpe" fill="var(--color-primary)" radius={[6, 6, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );

@@ -9,5 +9,5 @@ export const CATEGORIAS = [
   { id: 'Cardio', nombre: 'Cardio', icon: Activity, color: '#e07a5f' },
   { id: 'Flexibilidad', nombre: 'Flexibilidad', icon: HeartPulse, color: '#3a8c88' },
   { id: 'Deportes', nombre: 'Deportes', icon: Trophy, color: '#f2cc8f' },
-  { id: 'Resistencia', nombre: 'Resistencia', icon: Timer, color: '#2c3e50' }
+  { id: 'Resistencia', nombre: 'Resistencia', icon: Timer, color: '#9b59b6' }
 ];

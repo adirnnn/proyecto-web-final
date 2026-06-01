@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { GymSession, Exercise } from '../types/item';
 import { generateUUID } from '../utils/uuid';
 import { CATEGORIAS } from '../utils/categorias';
+import { X, Plus, Save } from 'lucide-react';
 import './FormularioItem.css';
 
 interface Props {
@@ -20,7 +21,7 @@ export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
   const [puntuacion, setPuntuacion] = useState(5);
   const [notas, setNotas] = useState('');
   const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date().toISOString().split('T')[0]);
-  const [duracionMinutos, setDuracionMinutos] = useState(60);
+  const [duracionMinutos, setDuracionMinutos] = useState<number | ''>(60);
   const [ejercicios, setEjercicios] = useState<Exercise[]>([]);
 
   const resetForm = () => {
@@ -64,16 +65,20 @@ export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
     const newEx: Exercise = {
       id: generateUUID(),
       nombre: '',
-      sets: 3,
-      reps: 10,
-      peso: 0
+      sets: '' as any,
+      reps: '' as any,
+      peso: '' as any
     };
     setEjercicios([...ejercicios, newEx]);
   };
 
   const updateExercise = (id: string, field: keyof Exercise, value: string | number) => {
+    let parsedValue = value;
+    if (field !== 'nombre') {
+      parsedValue = value === '' ? '' : Number(value);
+    }
     setEjercicios(ejercicios.map(ex => 
-      ex.id === id ? { ...ex, [field]: value } : ex
+      ex.id === id ? { ...ex, [field]: parsedValue } : ex
     ));
   };
 
@@ -84,7 +89,7 @@ export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const volumenTotal = ejercicios.reduce((acc, ex) => acc + (ex.sets * ex.reps * ex.peso), 0);
+    const volumenTotal = ejercicios.reduce((acc, ex) => acc + ((Number(ex.sets) || 0) * (Number(ex.reps) || 0) * (Number(ex.peso) || 0)), 0);
     
     let fechaISO = new Date().toISOString();
     try {
@@ -107,9 +112,14 @@ export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
       fechaActividad: now,
       notas,
       atributos: {
-        duracionMinutos,
+        duracionMinutos: Number(duracionMinutos) || 0,
         volumenTotal,
-        ejercicios
+        ejercicios: ejercicios.map(ex => ({
+          ...ex,
+          sets: Number(ex.sets) || 0,
+          reps: Number(ex.reps) || 0,
+          peso: Number(ex.peso) || 0
+        }))
       },
       activo: true
     };
@@ -123,116 +133,144 @@ export const FormularioItem = ({ onSave, editingItem, onCancel }: Props) => {
   };
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="gym-form">
-      <h2>{editingItem ? 'Editar Sesión' : 'Nueva Sesión (Alt+N)'}</h2>
-      <div className="form-group">
-        <label>Nombre Rutina:</label>
-        <input 
-          ref={nombreInputRef}
-          value={nombre} 
-          onChange={e => setNombre(e.target.value)} 
-          placeholder="Ej: Pierna, Empuje..." 
-          required 
-        />
-      </div>
-      
-      <div className="form-group">
-        <label>Categoría:</label>
-        <select value={categoriaId} onChange={e => setCategoriaId(e.target.value as GymSession['categoriaId'])}>
-          {CATEGORIAS.map(cat => (
-            <option key={cat.id} value={cat.id}>{cat.nombre}</option>
-          ))}
-        </select>
-      </div>
-
-      <div className="form-group">
-        <label>Fecha de Sesión:</label>
-        <input 
-          type="date" 
-          value={fechaSeleccionada} 
-          onChange={e => setFechaSeleccionada(e.target.value)} 
-          required 
-        />
-      </div>
-
-      <div className="form-group">
-        <label>Duración (min):</label>
-        <input 
-          type="number" 
-          value={duracionMinutos} 
-          onChange={e => setDuracionMinutos(Number(e.target.value))} 
-        />
-      </div>
-
-      <div className="form-group">
-        <label>RPE (0-10): {puntuacion}</label>
-        <input 
-          type="range" min="0" max="10" 
-          value={puntuacion} 
-          onChange={e => setPuntuacion(Number(e.target.value))} 
-        />
-      </div>
-
-      <div className="form-group">
-        <label>Notas:</label>
-        <textarea 
-          value={notas} 
-          onChange={e => setNotas(e.target.value)} 
-          placeholder="Comentarios..." 
-        />
-      </div>
-
-      <div className="exercises-section">
-        <h3>Ejercicios</h3>
-        <div className="exercise-header">
-          <span>Ejercicio</span>
-          <span>Sets</span>
-          <span>Reps</span>
-          <span>Peso (kg)</span>
-          <span></span>
-        </div>
-        {ejercicios.map(ex => (
-          <div key={ex.id} className="exercise-row">
-            <input 
-              placeholder="Ejercicio" 
-              value={ex.nombre} 
-              onChange={e => updateExercise(ex.id, 'nombre', e.target.value)} 
+    <div className="formulario-item">
+      <form ref={formRef} onSubmit={handleSubmit} className="form-inner">
+        <h2>{editingItem ? 'Editar Sesión' : 'Nueva Sesión'}</h2>
+        
+        <div className="form-grid">
+          <div className="form-group full-width">
+            <label htmlFor="nombre">Nombre del Entrenamiento</label>
+            <input
+              ref={nombreInputRef}
+              type="text"
+              id="nombre"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              placeholder="Ej: Empuje A, Día de Pierna..."
               required
             />
-            <input 
-              type="number" placeholder="Sets" 
-              value={ex.sets} 
-              onChange={e => updateExercise(ex.id, 'sets', Number(e.target.value))} 
-              required
-            />
-            <input 
-              type="number" placeholder="Reps" 
-              value={ex.reps} 
-              onChange={e => updateExercise(ex.id, 'reps', Number(e.target.value))} 
-              required
-            />
-            <input 
-              type="number" placeholder="Peso (kg)" 
-              value={ex.peso} 
-              onChange={e => updateExercise(ex.id, 'peso', Number(e.target.value))} 
-              required
-            />
-            <button type="button" onClick={() => removeExercise(ex.id)}>x</button>
           </div>
-        ))}
-        <button type="button" className="add-ex-btn" onClick={addExercise}>+ Agregar Ejercicio</button>
-      </div>
 
-      <div className="form-actions">
-        <button type="submit" className="save-btn">
-          {editingItem ? 'Actualizar Sesión' : 'Guardar Sesión'}
-        </button>
-        {editingItem && (
-          <button type="button" className="cancel-btn" onClick={onCancel}>
-            Cancelar Edición
+          <div className="form-group">
+            <label htmlFor="categoria">Categoría</label>
+            <select
+              id="categoria"
+              value={categoriaId}
+              onChange={(e) => setCategoriaId(e.target.value as GymSession['categoriaId'])}
+            >
+              {CATEGORIAS.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="fecha">Fecha de Sesión</label>
+            <input
+              type="date"
+              id="fecha"
+              value={fechaSeleccionada}
+              onChange={(e) => setFechaSeleccionada(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="duracion">Duración (min)</label>
+            <input
+              type="number"
+              id="duracion"
+              value={duracionMinutos}
+              onChange={(e) => setDuracionMinutos(e.target.value === '' ? '' : Number(e.target.value))}
+            />
+
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="puntuacion">RPE (Esfuerzo 1-10): {puntuacion}</label>
+            <input
+              type="range"
+              id="puntuacion"
+              min="0"
+              max="10"
+              value={puntuacion}
+              onChange={(e) => setPuntuacion(Number(e.target.value))}
+            />
+          </div>
+
+          <div className="form-group full-width">
+            <label htmlFor="notas">Notas</label>
+            <textarea
+              id="notas"
+              value={notas}
+              onChange={(e) => setNotas(e.target.value)}
+              placeholder="¿Cómo te sentiste hoy?"
+              rows={3}
+            />
+          </div>
+        </div>
+
+        <div className="exercises-section">
+          <div className="exercise-header">
+            <span>Ejercicio</span>
+            <span>Sets</span>
+            <span>Reps</span>
+            <span>Peso (kg)</span>
+            <span></span>
+          </div>
+
+          {ejercicios.map((ex) => (
+            <div key={ex.id} className="exercise-row">
+              <input
+                type="text"
+                placeholder="Ejercicio"
+                value={ex.nombre}
+                onChange={(e) => updateExercise(ex.id, 'nombre', e.target.value)}
+                required
+              />
+              <input
+                type="number"
+                placeholder="Sets"
+                value={ex.sets}
+                onChange={(e) => updateExercise(ex.id, 'sets', e.target.value)}
+                required
+              />
+              <input
+                type="number"
+                placeholder="Reps"
+                value={ex.reps}
+                onChange={(e) => updateExercise(ex.id, 'reps', e.target.value)}
+                required
+              />
+              <input
+                type="number"
+                placeholder="Peso"
+                value={ex.peso}
+                onChange={(e) => updateExercise(ex.id, 'peso', e.target.value)}
+                required
+              />
+              <button type="button" className="remove-ex-btn" onClick={() => removeExercise(ex.id)}>
+                <X size={18} />
+              </button>
+            </div>
+          ))}
+
+          <button type="button" className="btn-add-exercise" onClick={addExercise}>
+            <Plus size={18} style={{ marginRight: '8px' }} />
+            Agregar Ejercicio
           </button>
-        )}
-      </div>
-    </form>
+        </div>
+
+        <div className="form-actions">
+          <button type="submit" className="btn-save">
+            <Save size={18} style={{ marginRight: '8px' }} />
+            {editingItem ? 'Guardar Cambios' : 'Registrar Sesión'}
+          </button>
+          <button type="button" className="btn-cancel" onClick={onCancel}>
+            {editingItem ? 'Cancelar Edición' : 'Limpiar'}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };

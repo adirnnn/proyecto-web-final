@@ -1,108 +1,213 @@
-.gym-form {
+.formulario-item {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.75rem;
+  border-radius: var(--radius-outer);
+  border: 1px solid var(--glass-border);
+  max-width: 900px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.form-inner {
   background: var(--color-surface);
-  padding: 2rem;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  padding: 3rem;
+  border-radius: var(--radius-inner);
+  box-shadow: var(--shadow-inset);
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2.5rem;
+  overflow-x: hidden;
+}
+
+.form-inner h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
+}
+
+.full-width {
+  grid-column: span 2;
 }
 
 .form-group label {
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 800;
+  opacity: 0.5;
+  color: var(--color-primary);
 }
 
-input, select, textarea {
-  padding: 0.8rem;
-  border: 1px solid rgba(0,0,0,0.1);
-  border-radius: calc(var(--radius) / 2);
+.form-inner input, .form-inner select, .form-inner textarea {
+  background: var(--color-bg);
+  border: 1px solid var(--glass-border);
+  padding: 1rem 1.25rem;
+  border-radius: 16px;
+  font-family: inherit;
   font-size: 1rem;
-}
-
-input:focus, select:focus, textarea:focus {
+  font-weight: 600;
+  color: var(--color-text);
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(19, 94, 171, 0.1);
+  transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-.exercise-header {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr auto;
-  gap: 0.5rem;
-  font-size: 0.8rem;
-  font-weight: bold;
-  opacity: 0.6;
-  padding: 0 0.8rem;
-  margin-bottom: 0.2rem;
+.form-inner input:focus, .form-inner select:focus, .form-inner textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(19, 94, 171, 0.1);
+  transform: translateY(-1px);
+}
+
+.exercises-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--glass-border);
 }
 
 .exercise-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr auto;
-  gap: 0.5rem;
+  grid-template-columns: 1fr 60px 60px 60px 44px;
+  gap: 0.75rem;
   align-items: center;
-  margin-bottom: 0.5rem;
+  background: rgba(0, 0, 0, 0.02);
+  padding: 0.75rem 1rem;
+  border-radius: 20px;
 }
 
 .exercise-row input {
-  width: 100%;
+  padding: 0.6rem 0.75rem !important;
+  font-size: 0.85rem !important;
+  text-align: center;
 }
 
-.add-ex-btn {
-  background: transparent;
+.exercise-row input:first-child {
+  text-align: left;
+}
+
+.exercise-header {
+  display: grid;
+  grid-template-columns: 1fr 60px 60px 60px 44px;
+  gap: 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.4;
+  padding: 0 1rem;
+  text-align: center;
+}
+
+.exercise-header span:first-child {
+  text-align: left;
+}
+
+.btn-add-exercise {
+  background: var(--color-bg);
   color: var(--color-primary);
   border: 2px dashed var(--color-primary);
-  padding: 0.8rem;
-  border-radius: var(--radius);
+  padding: 1.25rem;
+  border-radius: 16px;
+  font-weight: 800;
+  font-size: 0.9rem;
   cursor: pointer;
-  font-weight: 600;
+  transition: all 0.3s ease;
   margin-top: 1rem;
 }
 
-.save-btn {
-  background: var(--color-primary);
-  color: white;
-  border: none;
-  padding: 1rem;
-  border-radius: var(--radius);
-  font-size: 1.1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.1s, background 0.2s;
-}
-
-.save-btn:hover {
-  background: var(--color-primary-hover);
-  transform: translateY(-2px);
+.btn-add-exercise:hover {
+  background: rgba(19, 94, 171, 0.05);
+  transform: scale(1.005);
 }
 
 .form-actions {
   display: flex;
   gap: 1rem;
-  margin-top: 1rem;
+  padding-top: 1.5rem;
 }
 
-.form-actions button {
-  flex: 1;
-}
-
-.cancel-btn {
-  background: transparent;
-  color: var(--color-text);
-  border: 1px solid rgba(0,0,0,0.2);
-  padding: 1rem;
-  border-radius: var(--radius);
+.btn-save {
+  flex: 2;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 1.25rem;
+  border-radius: 16px;
+  font-weight: 800;
   font-size: 1.1rem;
   cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+  box-shadow: 0 10px 20px rgba(19, 94, 171, 0.2);
 }
 
-.cancel-btn:hover {
+.btn-save:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+  box-shadow: 0 15px 30px rgba(19, 94, 171, 0.3);
+}
+
+.btn-cancel {
+  flex: 1;
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--glass-border);
+  padding: 1.25rem;
+  border-radius: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel:hover {
   background: rgba(0,0,0,0.05);
+}
+
+.remove-ex-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  background: white;
+  color: var(--color-danger);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.remove-ex-btn:hover {
+  background: var(--color-danger);
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .form-grid, .exercise-row, .exercise-header {
+    grid-template-columns: 1fr;
+  }
+  
+  .exercise-header {
+    display: none;
+  }
+  
+  .full-width {
+    grid-column: span 1;
+  }
+  
+  .form-inner {
+    padding: 1.5rem;
+  }
 }
