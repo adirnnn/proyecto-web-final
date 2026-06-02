@@ -7,7 +7,9 @@ import { FormularioItem } from './components/FormularioItem'
 import { Filtros } from './components/Filtros'
 import { ListaItems } from './components/ListaItems'
 import { GraficasGym } from './components/GraficasGym'
+import { BackendStatus } from './components/BackendStatus'
 import { Sun, Moon, Cloud, Database } from 'lucide-react'
+import { useProgresoPR } from './hooks/useProgresoPR'
 import './App.css'
 
 function App() {
@@ -17,13 +19,16 @@ function App() {
   const storageCtx = useContext(StorageContext);
   const themeCtx = useContext(ThemeContext);
 
+  // estadisticas del dominio usando custom hook
+  const { volumenHistorico, totalSesiones, promedioRPE } = useProgresoPR(estado.lista);
+
   useEffect(() => {
     if (storageCtx) {
       storageCtx.obtenerItems().then(items => {
         dispatch({ type: 'HIDRATAR', payload: items });
       }).catch(err => console.error("Error al hidratar:", err));
     }
-    // Solo dependemos de obtenerItems (estable) y el modo
+    // solo dependemos de obtenerItems (estable) y el modo
   }, [storageCtx?.obtenerItems, storageCtx?.modo]);
 
   const itemsVisibles = useMemo(() => {
@@ -78,6 +83,7 @@ function App() {
 
   const handleEdit = useCallback((item: GymSession) => {
     setEditingItem(item);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
   const handleFilter = useCallback((campo: 'filtroCategoria' | 'filtroEstado' | 'busqueda', valor: string) => {
@@ -94,7 +100,10 @@ function App() {
     <div className="container">
       <header>
         <div className="header-top">
-          <h1>Gym Tracker</h1>
+          <div>
+            <h1>Gym Tracker</h1>
+            <p className="subtitle">High-End Performance Tracking</p>
+          </div>
           <div className="header-actions">
             <button 
               className={`mode-toggle ${storageCtx.modo}`}
@@ -102,24 +111,31 @@ function App() {
               title={`Cambiando a modo ${storageCtx.modo === 'api' ? 'Local' : 'API'}`}
             >
               {storageCtx.modo === 'api' ? <Cloud size={18} /> : <Database size={18} />}
-              <span>{storageCtx.modo === 'api' ? 'En la Nube' : 'En Dispositivo'}</span>
-              {storageCtx.modo === 'api' && (
-                <span className={`status-dot ${storageCtx.error ? 'error' : 'ok'}`} title={storageCtx.error || 'Backend Conectado'}></span>
-              )}
+              <span>{storageCtx.modo === 'api' ? 'Cloud' : 'Local'}</span>
             </button>
+            <BackendStatus />
             <button className="theme-toggle" onClick={themeCtx.toggleTema}>
               {themeCtx.tema === 'claro' ? <Moon size={20} /> : <Sun size={20} />}
             </button>
           </div>
         </div>
-        <p>useReducer · Recharts · Optimización</p>
+        <div className="header-stats">
+          <div className="stat-item">
+            <span>Sesiones</span>
+            {totalSesiones}
+          </div>
+          <div className="stat-item">
+            <span>Volumen</span>
+            {volumenHistorico.toLocaleString()} kg
+          </div>
+          <div className="stat-item">
+            <span>RPE Promedio</span>
+            {promedioRPE}
+          </div>
+        </div>
       </header>
       
       <main className="content">
-        <section className="dashboard-section">
-          <GraficasGym items={itemsVisibles} />
-        </section>
-
         <section className="form-section">
           <FormularioItem onSave={handleSave} editingItem={editingItem} onCancel={() => setEditingItem(null)} />
         </section>
@@ -142,6 +158,13 @@ function App() {
             onEdit={handleEdit}
             onAddActivity={handleAddActivity}
           />
+        </section>
+
+        <section className="dashboard-section">
+          <div className="list-header">
+            <h2>Métricas de Progreso</h2>
+          </div>
+          <GraficasGym items={itemsVisibles} />
         </section>
       </main>
     </div>

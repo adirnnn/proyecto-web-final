@@ -5,9 +5,12 @@ body[data-theme="claro"] {
   --color-text: #2c3e50;
   --color-surface: #ffffff;
   --color-danger: #e74c3c;
-  --radius: 12px;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --radius-outer: 32px;
+  --radius-inner: 24px;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.02);
+  --shadow-inset: inset 0 1px 1px rgba(255, 255, 255, 0.8);
   --spacing: 1rem;
+  --glass-border: rgba(255, 255, 255, 0.4);
 }
 
 body[data-theme="oscuro"] {
@@ -17,23 +20,41 @@ body[data-theme="oscuro"] {
   --color-text: #efebe3;
   --color-surface: #2c3e50;
   --color-danger: #e07a5f;
-  --radius: 12px;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  --radius-outer: 32px;
+  --radius-inner: 24px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  --shadow-inset: inset 0 1px 1px rgba(255, 255, 255, 0.05);
   --spacing: 1rem;
+  --glass-border: rgba(255, 255, 255, 0.08);
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }
 
 body {
   background-color: var(--color-bg);
   color: var(--color-text);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  line-height: 1.5;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  transition: background-color 0.5s cubic-bezier(0.32, 0.72, 0, 1), color 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  min-height: 100dvh;
 }
 
 #root {
