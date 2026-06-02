@@ -94,7 +94,6 @@ header .subtitle {
 
 .status-indicator.online { border-color: rgba(46, 204, 113, 0.3); }
 .status-indicator.offline { border-color: rgba(231, 76, 60, 0.3); }
-}
 
 /* Inner Core */
 .mode-toggle span, .theme-toggle svg, .status-indicator span {
