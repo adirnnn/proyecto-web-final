@@ -7,24 +7,9 @@ const itemsRouter = require('./routes/items');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuración de CORS dinámica para despliegue en Render / Vercel
+// Configuración de CORS hiper-relajada para asegurar que la defensa del proyecto funcione
 app.use(cors({
-  origin: function (origin, callback) {
-    // Permitir requests sin origin (ej. Postman) o desde localhost
-    if (!origin || origin.startsWith('http://localhost')) {
-      return callback(null, true);
-    }
-
-    // Limpiar slash final si el usuario lo puso por accidente en Render
-    const frontendUrl = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.replace(/\/$/, '') : null;
-    
-    // Permitir si coincide con la variable de entorno exacta o si viene de un dominio de Vercel
-    if (origin === frontendUrl || origin.includes('vercel.app')) {
-      return callback(null, true);
-    }
-    
-    callback(new Error('No permitido por CORS'));
-  }
+  origin: '*'
 }));
 
 app.use(express.json());
