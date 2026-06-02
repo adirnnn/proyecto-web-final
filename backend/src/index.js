@@ -8,18 +8,22 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Configuración de CORS dinámica para despliegue en Render / Vercel
-const allowedOrigins = [
-  'http://localhost:5173', // Desarrollo local
-  process.env.FRONTEND_URL // Producción (Vercel)
-].filter(Boolean);
-
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
-      callback(null, true);
-    } else {
-      callback(new Error('No permitido por CORS'));
+    // Permitir requests sin origin (ej. Postman) o desde localhost
+    if (!origin || origin.startsWith('http://localhost')) {
+      return callback(null, true);
     }
+
+    // Limpiar slash final si el usuario lo puso por accidente en Render
+    const frontendUrl = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.replace(/\/$/, '') : null;
+    
+    // Permitir si coincide con la variable de entorno exacta o si viene de un dominio de Vercel
+    if (origin === frontendUrl || origin.includes('vercel.app')) {
+      return callback(null, true);
+    }
+    
+    callback(new Error('No permitido por CORS'));
   }
 }));
 
